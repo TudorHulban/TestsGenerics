@@ -14,7 +14,8 @@ type node struct {
 	cache      *cache
 	partitions []string
 
-	id     int
+	id     int // node IDs are known
+	factor int // redundancy factor
 	isRoot bool
 }
 
@@ -22,6 +23,7 @@ func newNode(id int, isRoot bool) *node {
 	n := node{
 		id:     id,
 		isRoot: isRoot,
+		factor: 2,
 
 		next:     make([]*node, 0),
 		previous: make([]*node, 0),
