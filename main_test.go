@@ -10,5 +10,5 @@ func TestHashing(t *testing.T) {
 		id: 34,
 	}
 
-	fmt.Printf(hashNode(n) + "\n")
+	fmt.Printf(hash.hashNode(n) + "\n")
 }

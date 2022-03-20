@@ -11,15 +11,27 @@ type node struct {
 	next     []*node // ordered, ascending
 	previous []*node // ordered, ascending
 
-	id int
+	cache      *cache
+	partitions []string
+
+	id     int
+	isRoot bool
 }
 
-func newNode(id int) *node {
-	return &node{
-		id:       id,
+func newNode(id int, isRoot bool) *node {
+	n := node{
+		id:     id,
+		isRoot: isRoot,
+
 		next:     make([]*node, 0),
 		previous: make([]*node, 0),
 	}
+
+	if n.isRoot {
+		n.partitions = hash.partition()
+	}
+
+	return &n
 }
 
 func (n *node) registerNode(no *node) error {
