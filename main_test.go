@@ -7,7 +7,7 @@ import (
 
 func TestHashing(t *testing.T) {
 	n := node{
-		id: "34",
+		id: 34,
 	}
 
 	fmt.Printf(hashNode(n) + "\n")

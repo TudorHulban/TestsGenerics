@@ -4,6 +4,7 @@ import "github.com/gofiber/fiber/v2"
 
 type server struct {
 	engine *fiber.App
+	n      *node
 	cache  *cache
 }
 

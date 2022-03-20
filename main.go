@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"strconv"
 
 	"github.com/gofiber/fiber/v2"
 )
@@ -11,16 +12,17 @@ func hasher(s string) string {
 }
 
 func hashNode(n node) string {
-	return hasher(n.id)
+	return hasher(strconv.Itoa(n.id))
 }
 
 func main() {
 	s := server{
 		engine: fiber.New(),
+		n:      newNode(7),
 		cache:  newCache(),
 	}
 
 	s.engine.Get("/myidis/:id", s.announce)
 
-	log.Fatal(s.engine.Listen(":8080"))
+	log.Fatal(s.engine.Listen(s.n.listenOn()))
 }
