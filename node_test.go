@@ -10,12 +10,12 @@ import (
 func TestAppend(t *testing.T) {
 	root := newRoot(7)
 
-	n1 := newNode(5)
+	n1 := newNode(5, root.getID())
 
 	root.appendToPrevious(n1)
 	require.Equal(t, 1, len(root.previous), "previous")
 
-	n2 := newNode(9)
+	n2 := newNode(9, root.getID())
 
 	root.appendToNext(n2)
 	require.Equal(t, 1, len(root.next), "next")
@@ -30,15 +30,15 @@ func TestListenSock(t *testing.T) {
 func TestRegister(t *testing.T) {
 	root := newRoot(7)
 
-	n1 := newNode(5)
+	n1 := newNode(5, root.getID())
 
 	root.registerNode(n1)
 	require.Equal(t, 1, len(root.previous), "previous")
 
-	n2 := newNode(9)
+	n2 := newNode(9, root.getID())
 	root.registerNode(n2)
 
-	n3 := newNode(8)
+	n3 := newNode(8, root.getID())
 	root.registerNode(n3)
 
 	require.Equal(t, 2, len(root.next), "next")

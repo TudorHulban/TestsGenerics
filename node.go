@@ -16,12 +16,13 @@ type node struct {
 
 	id     int // node IDs are known
 	factor int // redundancy factor
-	isRoot bool
+	rootID int
 }
 
-func newNode(id int) *node {
+func newNode(id, rootID int) *node {
 	return &node{
 		id:     id,
+		rootID: rootID,
 		factor: 2,
 
 		next:     make([]*node, 0),
@@ -30,12 +31,19 @@ func newNode(id int) *node {
 }
 
 func newRoot(id int) *node {
-	n := newNode(id)
+	n := newNode(id, id)
 
-	n.isRoot = true
 	n.partitions = hash.partition()
 
 	return n
+}
+
+func (n node) isRoot() bool {
+	return n.id == n.rootID
+}
+
+func (n node) getID() int {
+	return n.id
 }
 
 func (n *node) registerNode(no *node) error {
