@@ -19,21 +19,23 @@ type node struct {
 	isRoot bool
 }
 
-func newNode(id int, isRoot bool) *node {
-	n := node{
+func newNode(id int) *node {
+	return &node{
 		id:     id,
-		isRoot: isRoot,
 		factor: 2,
 
 		next:     make([]*node, 0),
 		previous: make([]*node, 0),
 	}
+}
 
-	if n.isRoot {
-		n.partitions = hash.partition()
-	}
+func newRoot(id int) *node {
+	n := newNode(id)
 
-	return &n
+	n.isRoot = true
+	n.partitions = hash.partition()
+
+	return n
 }
 
 func (n *node) registerNode(no *node) error {
