@@ -2,32 +2,34 @@ package main
 
 import (
 	"fmt"
-	"io"
 	"net/http"
 	"strconv"
-	"strings"
 )
 
+type nodeData struct {
+	partitions []string
+	id         int
+}
+
+type ring []*nodeData // would be sent in announciation response
+
 type node struct {
-	next     []*node // ordered, ascending
-	previous []*node // ordered, ascending
+	*neighbors
 
 	cache      *cache
 	partitions []string
 
 	id     int // node IDs are known
-	factor int // redundancy factor
 	rootID int
+	factor int // redundancy factor
 }
 
 func newNode(id, rootID int) *node {
 	return &node{
-		id:     id,
-		rootID: rootID,
-		factor: 2,
-
-		next:     make([]*node, 0),
-		previous: make([]*node, 0),
+		neighbors: newNeighbors(),
+		id:        id,
+		rootID:    rootID,
+		factor:    2,
 	}
 }
 
@@ -47,9 +49,16 @@ func (n node) getID() int {
 	return n.id
 }
 
+func (n *node) getNodeData() *nodeData {
+	return &nodeData{
+		id:         n.id,
+		partitions: n.partitions,
+	}
+}
+
 func (n *node) registerNode(no *node) error {
 	if n.id > no.id {
-		n.appendToPrevious(no)
+		n.appendToPrevious(no.getNodeData())
 		return nil
 	}
 
@@ -57,58 +66,17 @@ func (n *node) registerNode(no *node) error {
 		return fmt.Errorf("node to register has the same ID(%d) with curent node", no.id)
 	}
 
-	n.appendToNext(no)
+	n.appendToNext(no.getNodeData())
 
 	return nil
 }
 
-func (n *node) appendToPrevious(no *node) {
-	if len(n.previous) == 0 {
-		n.previous = append(n.previous, no)
-
-		return
+func (n *node) registerNodeID(id int) error {
+	no := node{
+		id: id,
 	}
 
-	for i := len(n.previous) - 1; i >= 0; i-- {
-		if no.id > n.previous[i].id {
-			insertAtIndex[*node](&n.previous, i, no)
-			return
-		}
-	}
-}
-
-func (n *node) appendToNext(no *node) {
-	if len(n.next) == 0 {
-		n.next = append(n.next, no)
-
-		return
-	}
-
-	for i := 0; i < len(n.next); i++ {
-		if no.id < n.next[i].id {
-			insertAtIndex[*node](&n.next, i, no)
-			return
-		}
-	}
-}
-
-func (n node) neighborsTo(w io.Writer) {
-	var res []string
-
-	res = append(res, fmt.Sprintf("Node ID; %d", n.id))
-	res = append(res, fmt.Sprintf("Previous Set(%d):", len(n.previous)))
-
-	info := func(ix int, no *node) {
-		res = append(res, fmt.Sprintf("Element: %d with ID: %d.\n", ix, no.id))
-	}
-
-	forEach[*node](n.previous, info)
-
-	res = append(res, fmt.Sprintf("Next Set(%d):", len(n.next)))
-
-	forEach[*node](n.next, info)
-
-	w.Write([]byte(strings.Join(res, "\n")))
+	return n.registerNode(&no)
 }
 
 func (n node) listenFor(id int) string {

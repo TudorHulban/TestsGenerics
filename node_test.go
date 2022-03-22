@@ -12,19 +12,19 @@ func TestAppend(t *testing.T) {
 
 	n1 := newNode(5, root.getID())
 
-	root.appendToPrevious(n1)
+	root.appendToPrevious(n1.getNodeData())
 	require.Equal(t, 1, len(root.previous), "previous")
 
 	n2 := newNode(9, root.getID())
 
-	root.appendToNext(n2)
+	root.appendToNext(n2.getNodeData())
 	require.Equal(t, 1, len(root.next), "next")
 }
 
 func TestListenSock(t *testing.T) {
 	root := newRoot(7)
 
-	require.Equal(t, "8007", root.listenOn())
+	require.Equal(t, "127.0.0.1:8007", root.listenOn())
 }
 
 func TestRegister(t *testing.T) {
@@ -32,16 +32,18 @@ func TestRegister(t *testing.T) {
 
 	n1 := newNode(5, root.getID())
 
-	root.registerNode(n1)
+	require.NoError(t, root.registerNode(n1))
 	require.Equal(t, 1, len(root.previous), "previous")
+	require.Equal(t, 1, len(*root.getRing()))
 
 	n2 := newNode(9, root.getID())
-	root.registerNode(n2)
+	require.NoError(t, root.registerNode(n2))
 
 	n3 := newNode(8, root.getID())
-	root.registerNode(n3)
+	require.NoError(t, root.registerNode(n3))
 
 	require.Equal(t, 2, len(root.next), "next")
+	require.Equal(t, 3, len(*root.getRing()), "ring")
 
 	root.neighborsTo(os.Stdout)
 }

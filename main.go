@@ -40,6 +40,7 @@ func main() {
 		fmt.Printf("Root node with ID %d started.\n", id)
 	} else {
 		go s.n.announceTo(s.n.rootID)
+		go s.n.registerNodeID(s.n.rootID)
 	}
 
 	fmt.Printf("Node listening on port %s.\n", s.n.listenOn())
