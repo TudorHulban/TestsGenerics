@@ -34,13 +34,15 @@ func main() {
 		n:      node(),
 	}
 
-	s.engine.Get("/myidis/:id", s.announce)
+	s.engine.Get("/"+urlAnnounce+"/:id", s.announce)
 
 	if s.n.isRoot() {
 		fmt.Printf("Root node with ID %d started.\n", id)
+	} else {
+		go s.n.announceTo(s.n.rootID)
 	}
 
 	fmt.Printf("Node listening on port %s.\n", s.n.listenOn())
 
-	log.Fatal(s.engine.Listen(":" + s.n.listenOn()))
+	log.Fatal(s.engine.Listen(s.n.listenOn()))
 }

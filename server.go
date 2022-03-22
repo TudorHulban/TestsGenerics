@@ -1,6 +1,10 @@
 package main
 
-import "github.com/gofiber/fiber/v2"
+import (
+	"fmt"
+
+	"github.com/gofiber/fiber/v2"
+)
 
 type server struct {
 	engine *fiber.App
@@ -8,7 +12,9 @@ type server struct {
 }
 
 func (s *server) announce(c *fiber.Ctx) error {
-	// announcerID := c.Params("id")
+	announcerID := c.Params("id")
+
+	fmt.Printf("Node with ID: %s announced itself.\n", announcerID)
 
 	return nil
 }

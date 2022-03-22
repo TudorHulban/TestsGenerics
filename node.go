@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"io"
+	"net/http"
 	"strconv"
 	"strings"
 )
@@ -110,8 +111,40 @@ func (n node) neighborsTo(w io.Writer) {
 	w.Write([]byte(strings.Join(res, "\n")))
 }
 
-func (n node) listenOn() string {
-	id := "000" + strconv.Itoa(n.id)
+func (n node) listenFor(id int) string {
+	sock := "000" + strconv.Itoa(id)
 
-	return "8" + id[len(id)-3:]
+	return "127.0.0.1:8" + sock[len(sock)-3:]
+}
+
+func (n node) listenOn() string {
+	return n.listenFor(n.id)
+}
+
+func (n node) announceTo(id int) error {
+	url := "http://" + n.listenFor(id) + "/" + urlAnnounce + "/" + strconv.Itoa(n.id)
+
+	fmt.Printf("Announcing node to URL: %s", url)
+
+	req, errReq := http.NewRequest("GET", url, nil)
+	if errReq != nil {
+		return fmt.Errorf("announceTo: %w", errReq)
+	}
+
+	req.Header.Add("Accept", "application/json")
+	req.Header.Add("Content-Type", "application/json")
+
+	var client http.Client
+
+	resp, errCall := client.Do(req)
+	if errCall != nil {
+		return fmt.Errorf("announce on URL: %s gives: %w", url, errCall)
+	}
+	defer resp.Body.Close()
+
+	if resp.Status != "200 OK" {
+		return fmt.Errorf("status on announce to URL: %s is: %s", url, resp.Status)
+	}
+
+	return nil
 }
