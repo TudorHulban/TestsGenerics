@@ -3,7 +3,10 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
+
+	"github.com/TudorHulban/log"
 )
 
 type nodeData struct {
@@ -19,6 +22,8 @@ type node struct {
 	cache      *cache
 	partitions []string
 
+	l *log.Logger
+
 	id     int // node IDs are known
 	rootID int
 	factor int // redundancy factor
@@ -30,6 +35,7 @@ func newNode(id, rootID int) *node {
 		id:        id,
 		rootID:    rootID,
 		factor:    2,
+		l:         log.NewLogger(log.DEBUG, os.Stdout, true),
 	}
 }
 
@@ -59,6 +65,7 @@ func (n *node) getNodeData() *nodeData {
 func (n *node) registerNode(no *node) error {
 	if n.id > no.id {
 		n.appendToPrevious(no.getNodeData())
+
 		return nil
 	}
 

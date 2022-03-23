@@ -34,7 +34,7 @@ func TestRegister(t *testing.T) {
 
 	require.NoError(t, root.registerNode(n1))
 	require.Equal(t, 1, len(root.previous), "previous")
-	require.Equal(t, 1, len(*root.getRing()))
+	require.Equal(t, 2, len(*root.getRing(root.getNodeData())))
 
 	n2 := newNode(9, root.getID())
 	require.NoError(t, root.registerNode(n2))
@@ -43,7 +43,7 @@ func TestRegister(t *testing.T) {
 	require.NoError(t, root.registerNode(n3))
 
 	require.Equal(t, 2, len(root.next), "next")
-	require.Equal(t, 3, len(*root.getRing()), "ring")
+	require.Equal(t, 4, len(*root.getRing(root.getNodeData())), "ring")
 
 	root.neighborsTo(os.Stdout)
 }

@@ -3,6 +3,7 @@ module hashing
 go 1.18
 
 require (
+	github.com/TudorHulban/log v0.0.0-20220214093028-d8da8ca8850e
 	github.com/gofiber/fiber/v2 v2.29.0
 	github.com/stretchr/testify v1.7.1
 )

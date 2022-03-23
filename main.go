@@ -35,6 +35,7 @@ func main() {
 	}
 
 	s.engine.Get("/"+urlAnnounce+"/:id", s.announce)
+	s.engine.Get("/"+urlRing, s.logRing)
 
 	if s.n.isRoot() {
 		fmt.Printf("Root node with ID %d started.\n", id)

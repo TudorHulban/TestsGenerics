@@ -1,3 +1,6 @@
 package main
 
-const urlAnnounce = "myidis"
+const (
+	urlAnnounce = "myidis"
+	urlRing     = "ring"
+)

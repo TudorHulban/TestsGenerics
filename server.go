@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
+	"os"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -22,9 +23,21 @@ func (s *server) announce(c *fiber.Ctx) error {
 	}
 
 	fmt.Printf("Node with ID: %s announced itself.\n", announcerID)
-	s.n.registerNodeID(id)
 
-	fmt.Printf("Neighbors: %d\n", len(*s.n.getRing()))
+	errRe := s.n.registerNodeID(id)
+	if errRe != nil {
+		return c.Status(http.StatusInternalServerError).SendString(errRe.Error())
+	}
 
-	return c.JSON(s.n.getRing())
+	fmt.Printf("Neighbors: %d\n", len(*s.n.getRing(s.n.getNodeData())))
+
+	return c.JSON(s.n.getRing(s.n.getNodeData()))
+}
+
+func (s *server) logRing(c *fiber.Ctx) error {
+	s.n.neighborsTo(c)
+
+	s.n.neighborsTo(os.Stdout)
+
+	return nil
 }
