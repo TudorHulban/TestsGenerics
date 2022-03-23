@@ -46,4 +46,6 @@ func TestRegister(t *testing.T) {
 	require.Equal(t, 4, len(*root.getRing(root.getNodeData())), "ring")
 
 	root.neighborsTo(os.Stdout)
+
+	require.NoError(t, root.mapAssignments(), "assignments")
 }

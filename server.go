@@ -3,7 +3,6 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
@@ -36,8 +35,6 @@ func (s *server) announce(c *fiber.Ctx) error {
 
 func (s *server) logRing(c *fiber.Ctx) error {
 	s.n.neighborsTo(c)
-
-	s.n.neighborsTo(os.Stdout)
 
 	return nil
 }

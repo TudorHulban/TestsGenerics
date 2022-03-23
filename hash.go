@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"math"
 	"strconv"
 )
@@ -16,28 +15,24 @@ func (h hasher) partition() []string {
 	return []string{"0", "1", "2", "3", "4", "5", "6", "7", "8", "9"}
 }
 
-func (h hasher) assignments(factor, nodes int) map[int][]string {
-	res := make(map[int][]string)
-
+func (h hasher) assignments(factor int, r ring) map[int][]string {
 	total := len(h.partition())
-	each := factor * int(math.Floor(float64(total)/float64(nodes)))
+	each := factor * int(math.Floor(float64(total)/float64(len(r))))
 
 	if each > total {
 		each = total
 	}
 
-	fmt.Println(each)
-
-	return res
+	return h.chop(each, r)
 }
 
-func (h hasher) chop(each, nodes int) map[int][]string {
+func (h hasher) chop(each int, r ring) map[int][]string {
 	res := make(map[int][]string)
 
 	var positionPartition int
 	lengthPartition := len(h.partition())
 
-	for i := 0; i < nodes; i++ {
+	for _, nodeData := range r {
 		var buf []string
 
 		for j := 0; j < each; j++ {
@@ -49,7 +44,7 @@ func (h hasher) chop(each, nodes int) map[int][]string {
 			}
 		}
 
-		res[i] = buf
+		res[nodeData.ID] = buf
 	}
 
 	return res

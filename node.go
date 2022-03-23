@@ -83,7 +83,12 @@ func (n *node) registerNodeID(id int) error {
 		id: id,
 	}
 
-	return n.registerNode(&no)
+	errReg := n.registerNode(&no)
+	if errReg != nil {
+		return errReg
+	}
+
+	return n.mapAssignments()
 }
 
 func (n node) listenFor(id int) string {
@@ -119,6 +124,26 @@ func (n node) announceTo(id int) error {
 
 	if resp.Status != "200 OK" {
 		return fmt.Errorf("status on announce to URL: %s is: %s", url, resp.Status)
+	}
+
+	return nil
+}
+
+func (n *node) mapAssignments() error {
+	ring := n.getRing(n.getNodeData())
+	assignments := hash.assignments(2, *ring)
+
+	if len(*ring) != len(assignments) {
+		return fmt.Errorf("different number of nodes (%d) versus assignments (%d)", len(*ring), len(assignments))
+	}
+
+	for _, nodeData := range *ring {
+		data, exists := assignments[nodeData.ID]
+		if !exists {
+			return fmt.Errorf("assignment for node with ID: %d not found", nodeData.ID)
+		}
+
+		copy(nodeData.Partitions, data)
 	}
 
 	return nil
