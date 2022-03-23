@@ -9,12 +9,12 @@ import (
 	"github.com/TudorHulban/log"
 )
 
-type nodeData struct {
-	partitions []string
-	id         int
+type NodeData struct {
+	Partitions []string
+	ID         int
 }
 
-type ring []*nodeData // would be sent in announciation response
+type ring []*NodeData // would be sent in announciation response
 
 type node struct {
 	*neighbors
@@ -55,10 +55,10 @@ func (n node) getID() int {
 	return n.id
 }
 
-func (n *node) getNodeData() *nodeData {
-	return &nodeData{
-		id:         n.id,
-		partitions: n.partitions,
+func (n *node) getNodeData() *NodeData {
+	return &NodeData{
+		ID:         n.id,
+		Partitions: n.partitions,
 	}
 }
 

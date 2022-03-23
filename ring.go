@@ -7,18 +7,18 @@ import (
 )
 
 type neighbors struct {
-	next     []*nodeData // ordered, ascending
-	previous []*nodeData // ordered, ascending
+	next     []*NodeData // ordered, ascending
+	previous []*NodeData // ordered, ascending
 }
 
 func newNeighbors() *neighbors {
 	return &neighbors{
-		next:     make([]*nodeData, 0),
-		previous: make([]*nodeData, 0),
+		next:     make([]*NodeData, 0),
+		previous: make([]*NodeData, 0),
 	}
 }
 
-func (n *neighbors) appendToPrevious(no *nodeData) {
+func (n *neighbors) appendToPrevious(no *NodeData) {
 	if len(n.previous) == 0 {
 		n.previous = append(n.previous, no)
 
@@ -26,17 +26,17 @@ func (n *neighbors) appendToPrevious(no *nodeData) {
 	}
 
 	for i := len(n.previous) - 1; i >= 0; i-- {
-		if no.id > n.previous[i].id {
-			insertAtIndex[*nodeData](&n.previous, i, no)
+		if no.ID > n.previous[i].ID {
+			insertAtIndex[*NodeData](&n.previous, i, no)
 
 			return
 		}
 	}
 
-	insertAtIndex[*nodeData](&n.previous, 0, no)
+	insertAtIndex[*NodeData](&n.previous, 0, no)
 }
 
-func (n *neighbors) appendToNext(no *nodeData) {
+func (n *neighbors) appendToNext(no *NodeData) {
 	if len(n.next) == 0 {
 		n.next = append(n.next, no)
 
@@ -44,8 +44,8 @@ func (n *neighbors) appendToNext(no *nodeData) {
 	}
 
 	for i := 0; i < len(n.next); i++ {
-		if no.id < n.next[i].id {
-			insertAtIndex[*nodeData](&n.next, i, no)
+		if no.ID < n.next[i].ID {
+			insertAtIndex[*NodeData](&n.next, i, no)
 
 			return
 		}
@@ -57,22 +57,22 @@ func (n *neighbors) appendToNext(no *nodeData) {
 func (n neighbors) neighborsTo(w io.Writer) {
 	var res []string
 
-	info := func(ix int, no *nodeData) {
-		res = append(res, fmt.Sprintf("Element: %d with ID: %d.", ix, no.id))
+	info := func(ix int, no *NodeData) {
+		res = append(res, fmt.Sprintf("Element: %d with ID: %d.", ix, no.ID))
 	}
 
 	res = append(res, fmt.Sprintf("Previous Set(%d):", len(n.previous)))
-	forEach[*nodeData](n.previous, info)
+	forEach[*NodeData](n.previous, info)
 
 	res = append(res, fmt.Sprintf("Next Set(%d):", len(n.next)))
-	forEach[*nodeData](n.next, info)
+	forEach[*NodeData](n.next, info)
 
 	res = append(res, "\n")
 
 	w.Write([]byte(strings.Join(res, "\n")))
 }
 
-func (n *neighbors) getRing(localNode *nodeData) *ring {
+func (n *neighbors) getRing(localNode *NodeData) *ring {
 	var res ring
 
 	res = append(res, n.previous...)

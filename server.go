@@ -29,7 +29,7 @@ func (s *server) announce(c *fiber.Ctx) error {
 		return c.Status(http.StatusInternalServerError).SendString(errRe.Error())
 	}
 
-	fmt.Printf("Neighbors: %d\n", len(*s.n.getRing(s.n.getNodeData())))
+	fmt.Printf("Neighbors: %d\n", len(*s.n.getRing(s.n.getNodeData()))-1)
 
 	return c.JSON(s.n.getRing(s.n.getNodeData()))
 }
