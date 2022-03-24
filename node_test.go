@@ -48,4 +48,5 @@ func TestRegister(t *testing.T) {
 	root.neighborsTo(os.Stdout)
 
 	require.NoError(t, root.mapAssignments(), "assignments")
+	require.Greater(t, len(root.next[0].Partitions), 0, "partitions assignment")
 }

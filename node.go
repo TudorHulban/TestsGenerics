@@ -62,7 +62,33 @@ func (n *node) getNodeData() *NodeData {
 	}
 }
 
+func (n *node) getNeighboorData(id int) *NodeData {
+	getNode := func(s []*NodeData) *NodeData {
+		for _, node := range s {
+			if node.ID == id {
+				return node
+			}
+		}
+
+		return nil
+	}
+
+	if id < n.id {
+		return getNode(n.previous)
+	}
+
+	if id == n.id {
+		return n.getNodeData()
+	}
+
+	return getNode(n.next)
+}
+
 func (n *node) registerNode(no *node) error {
+	if n.getNeighboorData(no.id) != nil {
+		return fmt.Errorf("node with ID: %d is already registered", no.id)
+	}
+
 	if n.id > no.id {
 		n.appendToPrevious(no.getNodeData())
 
@@ -143,7 +169,12 @@ func (n *node) mapAssignments() error {
 			return fmt.Errorf("assignment for node with ID: %d not found", nodeData.ID)
 		}
 
-		copy(nodeData.Partitions, data)
+		if len(data) == 0 {
+			return fmt.Errorf("no partitions for node with ID: %d", nodeData.ID)
+		}
+
+		n.getNeighboorData(nodeData.ID).Partitions = []string{}
+		n.getNeighboorData(nodeData.ID).Partitions = append(n.getNeighboorData(nodeData.ID).Partitions, data...)
 	}
 
 	return nil
