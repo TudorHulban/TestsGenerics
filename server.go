@@ -38,3 +38,16 @@ func (s *server) logRing(c *fiber.Ctx) error {
 
 	return nil
 }
+
+func (s *server) partitions(c *fiber.Ctx) error {
+	partitionsID := c.Params("id")
+
+	id, errCo := strconv.Atoi(partitionsID)
+	if errCo != nil {
+		return c.SendStatus(http.StatusBadRequest)
+	}
+
+	s.n.neighbors.getPartitionsFor(id, c)
+
+	return nil
+}

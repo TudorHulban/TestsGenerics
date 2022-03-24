@@ -9,13 +9,6 @@ import (
 	"github.com/TudorHulban/log"
 )
 
-type NodeData struct {
-	Partitions []string
-	ID         int
-}
-
-type ring []*NodeData // would be sent in announciation response
-
 type node struct {
 	*neighbors
 
@@ -31,7 +24,7 @@ type node struct {
 
 func newNode(id, rootID int) *node {
 	return &node{
-		neighbors: newNeighbors(),
+		neighbors: newNeighbors(id),
 		id:        id,
 		rootID:    rootID,
 		factor:    2,

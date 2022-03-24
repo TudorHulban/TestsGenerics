@@ -6,15 +6,30 @@ import (
 	"strings"
 )
 
-type neighbors struct {
-	next     []*NodeData // ordered, ascending
-	previous []*NodeData // ordered, ascending
+type NodeData struct {
+	Partitions []string
+	ID         int
 }
 
-func newNeighbors() *neighbors {
+type ring []*NodeData // would be sent in announciation response
+
+type neighbors struct {
+	previous []*NodeData // ordered, ascending
+	local    *NodeData
+	next     []*NodeData // ordered, ascending
+}
+
+func newNeighbors(localID int) *neighbors {
 	return &neighbors{
-		next:     make([]*NodeData, 0),
 		previous: make([]*NodeData, 0),
+
+		// duplicated info
+		local: &NodeData{
+			ID:         localID,
+			Partitions: hash.partition(),
+		},
+
+		next: make([]*NodeData, 0),
 	}
 }
 
@@ -80,4 +95,34 @@ func (n *neighbors) getRing(localNode *NodeData) *ring {
 	res = append(res, n.next...)
 
 	return &res
+}
+
+func (n *neighbors) getPartitionsFor(id int, w io.Writer) {
+	partitions := n.getNeighborData(id).Partitions
+
+	fmt.Printf("get partitions: %s", partitions)
+
+	w.Write([]byte(strings.Join(partitions, ",")))
+}
+
+func (n *neighbors) getNeighborData(id int) *NodeData {
+	getNode := func(s []*NodeData) *NodeData {
+		for _, node := range s {
+			if node.ID == id {
+				return node
+			}
+		}
+
+		return nil
+	}
+
+	if id < n.local.ID {
+		return getNode(n.previous)
+	}
+
+	if id == n.local.ID {
+		return n.local
+	}
+
+	return getNode(n.next)
 }
