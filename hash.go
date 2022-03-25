@@ -23,7 +23,7 @@ func (h hasher) assignments(factor int, r ring) Assignments {
 		return h.chop(lengthPartition, factor, r)
 	}
 
-	each := factor * int(math.Floor(float64(lengthPartition)/float64(len(r))))
+	each := factor * int(1+math.Floor(float64(lengthPartition)/float64(len(r))))
 
 	extra := func() int {
 		if lengthPartition%(each+1) != 0 {
@@ -37,6 +37,10 @@ func (h hasher) assignments(factor int, r ring) Assignments {
 
 	if each > lengthPartition {
 		each = lengthPartition
+	}
+
+	if each == 0 {
+		each = 1
 	}
 
 	return h.chop(each, factor, r)
@@ -70,7 +74,7 @@ func (h hasher) chop(each, factor int, r ring) Assignments {
 	return res
 }
 
-func (h hasher) verifyFactor(factor int, a Assignments) error {
+func (h hasher) verifyFactor(factor, noPartitions int, a Assignments) error {
 	var assign []string
 
 	for _, partitions := range a {
@@ -78,6 +82,10 @@ func (h hasher) verifyFactor(factor int, a Assignments) error {
 	}
 
 	occ := occurences[string](assign)
+
+	if noPartitions > len(occ) {
+		return fmt.Errorf("not all partitions were mapped. missing %d", noPartitions-len(occ))
+	}
 
 	for partition, f := range occ {
 		if f < factor {

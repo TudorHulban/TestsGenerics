@@ -18,7 +18,7 @@ func TestAssignments(t *testing.T) {
 func TestAssignmentsDistribution(t *testing.T) {
 	root := newRoot(7)
 
-	chairs := 10
+	chairs := 40
 	maxReplicationFactor := 5
 
 	output, errCr := os.Create("assignment_distribution")
@@ -27,8 +27,12 @@ func TestAssignmentsDistribution(t *testing.T) {
 	}
 
 	writeTo := output
+	noPartitions := len(hash.partition())
 
-	for i := 1; i <= chairs; i++ {
+	var totalCases int
+	var noFailures int
+
+	for i := 1; i < chairs; i++ {
 		if i == root.id {
 			continue
 		}
@@ -43,7 +47,13 @@ func TestAssignmentsDistribution(t *testing.T) {
 			a := hash.assignments(f, *root.getRing(root.getNodeData()))
 			a.writeToWithFactor(writeTo, f)
 
-			assert.NoError(t, hash.verifyFactor(f, a), fmt.Sprintf("factor verification for number nodes: %d", i))
+			if !assert.NoError(t, hash.verifyFactor(f, noPartitions, a), fmt.Sprintf("factor verification for number nodes: %d", i)) {
+				noFailures++
+			}
+
+			totalCases++
 		}
 	}
+
+	t.Logf("\nFailed cases: %d from a total of %d.\n", noFailures, totalCases)
 }
