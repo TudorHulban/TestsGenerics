@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"math"
 	"strconv"
 )
@@ -16,23 +17,38 @@ func (h hasher) partition() []string {
 }
 
 func (h hasher) assignments(factor int, r ring) Assignments {
-	total := len(h.partition())
-	each := factor * int(math.Floor(float64(total)/float64(len(r))))
+	lengthPartition := len(h.partition())
 
-	if each > total {
-		each = total
+	if factor == len(r) {
+		return h.chop(lengthPartition, factor, r)
 	}
 
-	return h.chop(each, r)
+	each := factor * int(math.Floor(float64(lengthPartition)/float64(len(r))))
+
+	extra := func() int {
+		if lengthPartition%(each+1) != 0 {
+			return 1
+		}
+
+		return 0
+	}
+
+	each = each + extra()
+
+	if each > lengthPartition {
+		each = lengthPartition
+	}
+
+	return h.chop(each, factor, r)
 }
 
-func (h hasher) chop(each int, r ring) Assignments {
+func (h hasher) chop(each, factor int, r ring) Assignments {
 	res := make(map[int][]string)
 
 	var positionPartition int
 	lengthPartition := len(h.partition())
 
-	for _, nodeData := range r {
+	for ix, nodeData := range r {
 		var buf []string
 
 		for j := 0; j < each; j++ {
@@ -44,10 +60,32 @@ func (h hasher) chop(each int, r ring) Assignments {
 			}
 		}
 
-		res[nodeData.ID] = buf
+		if ix == len(r)-1 && factor > 1 && lengthPartition%each != 0 {
+			buf = append(buf, h.partition()[positionPartition:]...)
+		}
+
+		res[nodeData.ID] = removeDups[string](buf)
 	}
 
 	return res
+}
+
+func (h hasher) verifyFactor(factor int, a Assignments) error {
+	var assign []string
+
+	for _, partitions := range a {
+		assign = append(assign, partitions...)
+	}
+
+	occ := occurences[string](assign)
+
+	for partition, f := range occ {
+		if f < factor {
+			return fmt.Errorf("for partition '%s' factor is only %d versus required %d", partition, f, factor)
+		}
+	}
+
+	return nil
 }
 
 var hash hasher = func(s string) string {

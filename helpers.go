@@ -39,3 +39,34 @@ func forEach[T any](s []T, f func(int, T)) {
 		f(i, t)
 	}
 }
+
+func removeDups[T comparable](s []T) []T {
+	var res []T
+	buf := make(map[T]bool)
+
+	for _, value := range s {
+		if _, exists := buf[value]; exists {
+			continue
+		}
+
+		buf[value] = true
+		res = append(res, value)
+	}
+
+	return res
+}
+
+func occurences[T comparable](s []T) map[T]int {
+	res := make(map[T]int)
+
+	for _, value := range s {
+		if _, exists := res[value]; exists {
+			res[value]++
+			continue
+		}
+
+		res[value] = 1
+	}
+
+	return res
+}
