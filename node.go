@@ -3,10 +3,7 @@ package main
 import (
 	"fmt"
 	"net/http"
-	"os"
 	"strconv"
-
-	"github.com/TudorHulban/log"
 )
 
 type node struct {
@@ -14,8 +11,6 @@ type node struct {
 
 	cache      *cache
 	partitions []string
-
-	l *log.Logger
 
 	id     int // node IDs are known
 	rootID int
@@ -28,7 +23,6 @@ func newNode(id, rootID int) *node {
 		id:        id,
 		rootID:    rootID,
 		factor:    2,
-		l:         log.NewLogger(log.DEBUG, os.Stdout, true),
 	}
 }
 

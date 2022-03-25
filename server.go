@@ -5,12 +5,14 @@ import (
 	"net/http"
 	"strconv"
 
+	"github.com/TudorHulban/log"
 	"github.com/gofiber/fiber/v2"
 )
 
 type server struct {
 	engine *fiber.App
 	n      *node
+	l      *log.Logger
 }
 
 func (s *server) announce(c *fiber.Ctx) error {
@@ -21,7 +23,7 @@ func (s *server) announce(c *fiber.Ctx) error {
 		return c.SendStatus(http.StatusBadRequest)
 	}
 
-	fmt.Printf("Node with ID: %s announced itself.\n", announcerID)
+	s.l.Debugf("Node with ID: %s announced itself.\n", announcerID)
 
 	errRe := s.n.registerNodeID(id)
 	if errRe != nil {

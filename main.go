@@ -3,10 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
-	"log"
 	"os"
 	"strconv"
 
+	"github.com/TudorHulban/log"
 	"github.com/gofiber/fiber/v2"
 )
 
@@ -32,6 +32,7 @@ func main() {
 	s := server{
 		engine: fiber.New(),
 		n:      node(),
+		l:      log.NewLogger(log.DEBUG, os.Stdout, true),
 	}
 
 	s.engine.Get("/"+urlAnnounce+"/:id", s.announce)
@@ -47,5 +48,5 @@ func main() {
 
 	fmt.Printf("Node listening on port %s.\n", s.n.listenOn())
 
-	log.Fatal(s.engine.Listen(s.n.listenOn()))
+	s.engine.Listen(s.n.listenOn())
 }
