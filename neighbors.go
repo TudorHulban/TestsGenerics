@@ -18,8 +18,7 @@ func newNeighbors(localID int) *neighbors {
 
 		// duplicated info
 		local: &NodeData{
-			ID:         localID,
-			Partitions: hash.partition(),
+			ID: localID,
 		},
 
 		next: make([]*NodeData, 0),
@@ -91,11 +90,11 @@ func (n *neighbors) getRing(localNode *NodeData) *ring {
 }
 
 func (n *neighbors) getPartitionsFor(id int, w io.Writer) {
-	partitions := n.getNeighborData(id).Partitions
+	partitions := n.getNeighborData(id).Ranges
 
 	fmt.Printf("get partitions: %s", partitions)
 
-	w.Write([]byte(strings.Join(partitions, ",")))
+	w.Write([]byte(strings.Join(partitions.getRanges(), ",")))
 }
 
 func (n *neighbors) getNeighborData(id int) *NodeData {

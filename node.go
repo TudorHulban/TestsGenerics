@@ -10,11 +10,10 @@ type node struct {
 	*neighbors
 
 	cache      *cache
-	partitions []string
+	partitions Partitions
 
 	id     int // node IDs are known
 	rootID int
-	factor int // redundancy factor
 }
 
 func newNode(id, rootID int) *node {
@@ -22,14 +21,13 @@ func newNode(id, rootID int) *node {
 		neighbors: newNeighbors(id),
 		id:        id,
 		rootID:    rootID,
-		factor:    2,
 	}
 }
 
 func newRoot(id int) *node {
 	n := newNode(id, id)
 
-	n.partitions = hash.partition()
+	n.partitions = NewPartitions(1)
 
 	return n
 }
@@ -44,8 +42,8 @@ func (n node) getID() int {
 
 func (n *node) getNodeData() *NodeData {
 	return &NodeData{
-		ID:         n.id,
-		Partitions: n.partitions,
+		ID:     n.id,
+		Ranges: n.partitions,
 	}
 }
 
@@ -144,7 +142,7 @@ func (n node) announceTo(id int) error {
 
 func (n *node) mapAssignments() error {
 	ring := n.getRing(n.getNodeData())
-	assignments := hash.assignments(2, *ring)
+	assignments := hash.assign(*ring)
 
 	if len(*ring) != len(assignments) {
 		return fmt.Errorf("different number of nodes (%d) versus assignments (%d)", len(*ring), len(assignments))
@@ -160,8 +158,8 @@ func (n *node) mapAssignments() error {
 			return fmt.Errorf("no partitions for node with ID: %d", nodeData.ID)
 		}
 
-		n.getNeighboorData(nodeData.ID).Partitions = []string{}
-		n.getNeighboorData(nodeData.ID).Partitions = append(n.getNeighboorData(nodeData.ID).Partitions, data...)
+		n.getNeighboorData(nodeData.ID).Ranges = Partitions{}
+		n.getNeighboorData(nodeData.ID).Ranges = append(n.getNeighboorData(nodeData.ID).Ranges, data...)
 	}
 
 	return nil

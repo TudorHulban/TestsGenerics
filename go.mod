@@ -6,6 +6,7 @@ require (
 	github.com/TudorHulban/log v0.0.0-20220214093028-d8da8ca8850e
 	github.com/gofiber/fiber/v2 v2.29.0
 	github.com/stretchr/testify v1.7.1
+	golang.org/x/exp v0.0.0-20220325121720-054d8573a5d8
 )
 
 require (
